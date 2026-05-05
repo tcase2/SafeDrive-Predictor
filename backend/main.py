@@ -117,7 +117,10 @@ def register(body: UserRegister, db: Session = Depends(get_db)):
 
 @app.post("/auth/login", response_model=TokenResponse, tags=["Auth"])
 def login(body: UserLogin, db: Session = Depends(get_db)):
-    user = db.query(User).filter(User.username == body.username).first()
+    user = (
+        db.query(User).filter(User.username == body.username).first()
+        or db.query(User).filter(User.email == body.username).first()
+    )
     if not user or not verify_password(body.password, user.hashed_password):
         raise HTTPException(status_code=401, detail="Invalid username or password")
 
