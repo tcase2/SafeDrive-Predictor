@@ -764,13 +764,16 @@
         document.getElementById('condHumidity').textContent = `${w.humidity}%`;
         document.getElementById('condDesc').textContent    = w.description;
       } else {
-        document.getElementById('weatherCity').textContent = 'Manual';
+        const cityAttempted = document.getElementById('cityInput').value.trim();
+        document.getElementById('weatherCity').textContent = cityAttempted ? '⚠ City not found' : 'Manual';
         document.getElementById('condTemp').textContent    = `${document.getElementById('tempSlider').value}°F`;
         document.getElementById('condPrecip').textContent  = (parseFloat(document.getElementById('precipSlider').value)/100).toFixed(2) + ' in/hr';
         document.getElementById('condVis').textContent     = (parseFloat(document.getElementById('visSlider').value)/10).toFixed(1) + ' mi';
         document.getElementById('condWind').textContent    = '— mph';
         document.getElementById('condHumidity').textContent = '—';
-        document.getElementById('condDesc').textContent    = 'Manual Input';
+        document.getElementById('condDesc').textContent    = cityAttempted
+          ? `"${cityAttempted}" not found in weather database — using manual values`
+          : 'Manual Input';
       }
 
       // Vehicle

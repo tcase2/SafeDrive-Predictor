@@ -32,13 +32,31 @@ def fetch_weather(city: str) -> Optional[Dict[str, Any]]:
       - visibility   → always metres regardless of units; converted here to miles
       - precipitation→ always mm regardless of units; converted here to inches
 
-    US bias: if the query has no explicit country code (no comma), ",US" is appended
-    so that "Birmingham" resolves to Alabama, not England.
+    US bias: bare city names and "City, ST" formats are resolved to US.
+    Users can override with an explicit country code: "London,UK".
+
+    OpenWeather query format: city / city,country / city,state,country
+    "Burlington, NC" -> "Burlington,NC,US"
+    "London,UK"      -> "London,UK"  (already has country)
+    "Chicago"        -> "Chicago,US"
     """
+    US_STATES = {
+        "AL","AK","AZ","AR","CA","CO","CT","DE","FL","GA","HI","ID","IL","IN",
+        "IA","KS","KY","LA","ME","MD","MA","MI","MN","MS","MO","MT","NE","NV",
+        "NH","NJ","NM","NY","NC","ND","OH","OK","OR","PA","RI","SC","SD","TN",
+        "TX","UT","VT","VA","WA","WV","WI","WY","DC",
+    }
     try:
         url = f"{OPENWEATHER_BASE}/weather"
-        # Bias toward US cities unless the user already specified a country (contains comma)
-        query = city if "," in city else f"{city},US"
+        parts = [p.strip() for p in city.split(",")]
+        if len(parts) == 1:
+            query = f"{parts[0]},US"
+        elif len(parts) == 2 and parts[1].upper() in US_STATES:
+            # "Burlington, NC" -> "Burlington,NC,US"
+            query = f"{parts[0]},{parts[1].upper()},US"
+        else:
+            # Already has country code, or unrecognised format — use as-is
+            query = ",".join(parts)
         params = {
             "q": query,
             "appid": OPENWEATHER_API_KEY,
