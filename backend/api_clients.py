@@ -31,11 +31,16 @@ def fetch_weather(city: str) -> Optional[Dict[str, Any]]:
       - wind_speed   → mph (via units=imperial)
       - visibility   → always metres regardless of units; converted here to miles
       - precipitation→ always mm regardless of units; converted here to inches
+
+    US bias: if the query has no explicit country code (no comma), ",US" is appended
+    so that "Birmingham" resolves to Alabama, not England.
     """
     try:
         url = f"{OPENWEATHER_BASE}/weather"
+        # Bias toward US cities unless the user already specified a country (contains comma)
+        query = city if "," in city else f"{city},US"
         params = {
-            "q": city,
+            "q": query,
             "appid": OPENWEATHER_API_KEY,
             "units": "imperial",
         }
@@ -54,8 +59,10 @@ def fetch_weather(city: str) -> Optional[Dict[str, Any]]:
         # Visibility is always metres from OW — convert to miles
         visibility_miles = data.get("visibility", 16093) / 1609.34
 
+        country = data.get("sys", {}).get("country", "")
         return {
             "city": data.get("name", city),
+            "country": country,
             "temperature": round(data["main"]["temp"], 1),       # °F
             "precipitation": round(rain_in, 3),                  # in/hr
             "visibility": round(visibility_miles, 2),            # miles

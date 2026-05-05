@@ -157,7 +157,7 @@ def get_latest_record(driver_id: str, db: Session = Depends(get_db)):
 def predict(req: RiskPredictionRequest, db: Session = Depends(get_db)):
     # 1. Resolve weather
     weather_data = None
-    temp = req.temperature if req.temperature is not None else 15.0
+    temp = req.temperature if req.temperature is not None else 59.0
     precip = req.precipitation if req.precipitation is not None else 0.0
     vis = req.visibility if req.visibility is not None else 10.0
     wind_speed = 0.0

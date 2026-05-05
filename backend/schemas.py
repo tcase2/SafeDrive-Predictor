@@ -72,6 +72,7 @@ class RiskPredictionRequest(BaseModel):
 
 class WeatherData(BaseModel):
     city: str
+    country: Optional[str] = None
     temperature: float
     precipitation: float
     visibility: float

@@ -756,7 +756,7 @@
       // Weather conditions
       const w = res.weather;
       if (w) {
-        document.getElementById('weatherCity').textContent = w.city;
+        document.getElementById('weatherCity').textContent = w.country ? `${w.city}, ${w.country}` : w.city;
         document.getElementById('condTemp').textContent    = `${w.temperature}°F`;
         document.getElementById('condPrecip').textContent  = `${w.precipitation.toFixed(2)} in/hr`;
         document.getElementById('condVis').textContent     = `${w.visibility.toFixed(1)} mi`;
