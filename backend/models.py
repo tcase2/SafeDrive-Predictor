@@ -1,6 +1,19 @@
-from sqlalchemy import Column, Integer, String, Float, DateTime, Boolean, Text
+from sqlalchemy import Column, Integer, String, Float, DateTime, Boolean, Text, ForeignKey
+from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from backend.database import Base
+
+
+class User(Base):
+    __tablename__ = "users"
+
+    id = Column(Integer, primary_key=True, index=True)
+    username = Column(String(50), unique=True, nullable=False, index=True)
+    email = Column(String(150), unique=True, nullable=False)
+    hashed_password = Column(String, nullable=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+    predictions = relationship("PredictionLog", back_populates="user")
 
 
 class Vehicle(Base):
@@ -35,6 +48,7 @@ class PredictionLog(Base):
     __tablename__ = "prediction_logs"
 
     id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=True)
     driver_id = Column(String(50), nullable=True)
     vin = Column(String(17), nullable=True)
     temperature = Column(Float)
@@ -48,4 +62,7 @@ class PredictionLog(Base):
     base_score = Column(Float)
     final_score = Column(Float)
     risk_level = Column(String(20))
+    city = Column(String(100), nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+    user = relationship("User", back_populates="predictions")

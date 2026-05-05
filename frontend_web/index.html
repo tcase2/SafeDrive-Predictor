@@ -163,26 +163,97 @@
 
     /* Chart canvas */
     #scenarioChart { max-height: 180px; }
+
+    /* Auth overlay */
+    #authOverlay { background: rgba(2,6,23,0.97); backdrop-filter: blur(12px); }
+    .auth-tab-active { background: rgba(99,102,241,0.2); color: #a5b4fc; border: 1px solid rgba(99,102,241,0.3); }
+    .auth-tab { background: transparent; border: 1px solid transparent; color: #64748b; }
+    .auth-tab:hover { color: #94a3b8; }
   </style>
 </head>
 
 <body class="flex h-screen overflow-hidden">
 
   <!-- ═══════════════════════════════════════════════════════════════
+       AUTH OVERLAY
+  ═══════════════════════════════════════════════════════════════ -->
+  <div id="authOverlay" class="fixed inset-0 z-50 flex items-center justify-center">
+    <div class="glass-strong p-8 w-full max-w-sm mx-4 fade-in">
+
+      <!-- Logo -->
+      <div class="flex items-center gap-3 mb-7">
+        <div class="w-10 h-10 rounded-xl bg-indigo-600 flex items-center justify-center shadow-lg" style="box-shadow:0 4px 20px rgba(99,102,241,0.4)">
+          <i data-lucide="shield-check" class="w-5 h-5 text-white"></i>
+        </div>
+        <div>
+          <div class="text-base font-bold text-white">SafeDrive Predictor</div>
+          <div class="text-xs text-slate-500">Road Risk Intelligence</div>
+        </div>
+      </div>
+
+      <!-- Tabs -->
+      <div class="flex gap-1 mb-5 p-1 rounded-xl" style="background:rgba(255,255,255,0.04)">
+        <button id="tabSignIn" onclick="switchTab('signin')" class="auth-tab-active flex-1 py-2 text-sm font-medium rounded-lg transition-all">Sign In</button>
+        <button id="tabRegister" onclick="switchTab('register')" class="auth-tab flex-1 py-2 text-sm font-medium rounded-lg transition-all">Create Account</button>
+      </div>
+
+      <!-- Sign In Form -->
+      <div id="formSignIn" class="space-y-3">
+        <input id="loginUsername" type="text" class="sd-input" placeholder="Username" autocomplete="username" />
+        <input id="loginPassword" type="password" class="sd-input" placeholder="Password" autocomplete="current-password" />
+        <div id="loginError" class="hidden text-xs text-rose-400 bg-rose-500 bg-opacity-10 border border-rose-500 border-opacity-20 rounded-lg px-3 py-2"></div>
+        <button onclick="handleLogin()" class="btn-primary" id="loginBtn">
+          <i data-lucide="log-in" class="w-4 h-4"></i>
+          <span>Sign In</span>
+        </button>
+      </div>
+
+      <!-- Register Form -->
+      <div id="formRegister" class="hidden space-y-3">
+        <input id="regUsername" type="text" class="sd-input" placeholder="Username (3–50 characters)" autocomplete="username" />
+        <input id="regEmail" type="email" class="sd-input" placeholder="Email address" autocomplete="email" />
+        <input id="regPassword" type="password" class="sd-input" placeholder="Password (min 8 characters)" autocomplete="new-password" />
+        <input id="regConfirm" type="password" class="sd-input" placeholder="Confirm password" autocomplete="new-password" />
+        <div id="registerError" class="hidden text-xs text-rose-400 bg-rose-500 bg-opacity-10 border border-rose-500 border-opacity-20 rounded-lg px-3 py-2"></div>
+        <button onclick="handleRegister()" class="btn-primary" id="registerBtn">
+          <i data-lucide="user-plus" class="w-4 h-4"></i>
+          <span>Create Account</span>
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════
        SIDEBAR
   ═══════════════════════════════════════════════════════════════ -->
   <aside class="sidebar w-72 flex flex-col overflow-y-auto flex-shrink-0">
 
-    <!-- Logo -->
+    <!-- Logo + User -->
     <div class="px-5 pt-6 pb-4 border-b border-white border-opacity-5">
-      <div class="flex items-center gap-3">
+      <div class="flex items-center gap-3 mb-4">
         <div class="w-9 h-9 rounded-xl bg-indigo-600 flex items-center justify-center shadow-lg shadow-indigo-500/30">
           <i data-lucide="shield-check" class="w-5 h-5 text-white"></i>
         </div>
         <div>
-          <div class="text-sm font-700 text-white" style="font-weight:700">SafeDrive</div>
+          <div class="text-sm text-white" style="font-weight:700">SafeDrive</div>
           <div class="text-xs text-slate-500">Risk Predictor v2</div>
         </div>
+      </div>
+      <!-- Signed-in user badge -->
+      <div class="flex items-center justify-between p-2.5 rounded-xl" style="background:rgba(99,102,241,0.08);border:1px solid rgba(99,102,241,0.15)">
+        <div class="flex items-center gap-2">
+          <div class="w-7 h-7 rounded-lg bg-indigo-500 bg-opacity-20 flex items-center justify-center">
+            <i data-lucide="user" class="w-3.5 h-3.5 text-indigo-400"></i>
+          </div>
+          <div>
+            <div id="sidebarUsername" class="text-xs font-semibold text-white">—</div>
+            <div class="text-xs text-slate-600">Signed in</div>
+          </div>
+        </div>
+        <button onclick="logout()" title="Sign out" class="text-slate-600 hover:text-rose-400 transition-colors p-1">
+          <i data-lucide="log-out" class="w-3.5 h-3.5"></i>
+        </button>
       </div>
     </div>
 
@@ -226,7 +297,6 @@
         <div class="section-label" style="gap:6px">
           <i data-lucide="user" class="w-3 h-3"></i> Driver Profile
         </div>
-        <input id="driverIdInput" type="text" class="sd-input mb-3" placeholder="Driver ID / Name" value="driver_01" />
         <div class="space-y-3">
           <div>
             <div class="flex justify-between text-xs text-slate-400 mb-1.5">
@@ -542,11 +612,11 @@
 
       </div><!-- /results -->
 
-      <!-- History Table (always shown) -->
+      <!-- My Predictions Table -->
       <div class="glass p-5">
         <div class="flex items-center gap-2 mb-4">
-          <i data-lucide="history" class="w-4 h-4 text-slate-400"></i>
-          <span class="text-sm font-semibold text-white">Recent Predictions</span>
+          <i data-lucide="history" class="w-4 h-4 text-indigo-400"></i>
+          <span class="text-sm font-semibold text-white">My Predictions</span>
           <button onclick="loadHistory()" class="ml-auto btn-secondary" style="padding:5px 10px; font-size:11px">
             <i data-lucide="refresh-cw" class="w-3 h-3"></i> Refresh
           </button>
@@ -555,8 +625,8 @@
           <table class="w-full text-xs">
             <thead>
               <tr class="text-slate-500 border-b border-white border-opacity-5">
-                <th class="text-left pb-2 font-medium">Time</th>
-                <th class="text-left pb-2 font-medium">Driver</th>
+                <th class="text-left pb-2 font-medium">Date / Time</th>
+                <th class="text-left pb-2 font-medium">Location</th>
                 <th class="text-left pb-2 font-medium">Score</th>
                 <th class="text-left pb-2 font-medium">Level</th>
                 <th class="text-left pb-2 font-medium">Precip</th>
@@ -565,7 +635,7 @@
               </tr>
             </thead>
             <tbody id="historyBody">
-              <tr><td colspan="7" class="py-6 text-center text-slate-600">Loading history…</td></tr>
+              <tr><td colspan="7" class="py-6 text-center text-slate-600">Sign in to view your history</td></tr>
             </tbody>
           </table>
         </div>
@@ -579,16 +649,142 @@
   ═══════════════════════════════════════════════════════════════ -->
   <script>
     const API = 'http://localhost:8080';
-    let currentResult   = null;
-    let scenarioChart   = null;
+    let currentResult    = null;
+    let scenarioChart    = null;
     let scenarioDebounce = null;
-    const ARC_LEN = Math.PI * 90; // 282.74
+    let currentUser      = null;
+    let authToken        = localStorage.getItem('sd_token');
+    const ARC_LEN = Math.PI * 90;
+
+    // ── Auth helpers ──────────────────────────────────────────────
+    function authHeaders() {
+      const h = { 'Content-Type': 'application/json' };
+      if (authToken) h['Authorization'] = `Bearer ${authToken}`;
+      return h;
+    }
+
+    function showAuthOverlay() {
+      document.getElementById('authOverlay').style.display = 'flex';
+    }
+
+    function hideAuthOverlay() {
+      document.getElementById('authOverlay').style.display = 'none';
+    }
+
+    function switchTab(tab) {
+      const isSignIn = tab === 'signin';
+      document.getElementById('formSignIn').classList.toggle('hidden', !isSignIn);
+      document.getElementById('formRegister').classList.toggle('hidden', isSignIn);
+      document.getElementById('tabSignIn').className = isSignIn ? 'auth-tab-active flex-1 py-2 text-sm font-medium rounded-lg transition-all' : 'auth-tab flex-1 py-2 text-sm font-medium rounded-lg transition-all';
+      document.getElementById('tabRegister').className = isSignIn ? 'auth-tab flex-1 py-2 text-sm font-medium rounded-lg transition-all' : 'auth-tab-active flex-1 py-2 text-sm font-medium rounded-lg transition-all';
+      document.getElementById('loginError').classList.add('hidden');
+      document.getElementById('registerError').classList.add('hidden');
+    }
+
+    function setAuthError(formId, msg) {
+      const el = document.getElementById(formId);
+      el.textContent = msg;
+      el.classList.remove('hidden');
+    }
+
+    async function checkAuth() {
+      if (!authToken) { showAuthOverlay(); return; }
+      try {
+        const r = await fetch(`${API}/auth/me`, { headers: authHeaders() });
+        if (!r.ok) throw new Error('Invalid token');
+        currentUser = await r.json();
+        onSignedIn();
+      } catch {
+        authToken = null;
+        localStorage.removeItem('sd_token');
+        showAuthOverlay();
+      }
+    }
+
+    function onSignedIn() {
+      hideAuthOverlay();
+      document.getElementById('sidebarUsername').textContent = currentUser.username;
+      loadHistory();
+      lucide.createIcons();
+    }
+
+    async function handleLogin() {
+      const username = document.getElementById('loginUsername').value.trim();
+      const password = document.getElementById('loginPassword').value;
+      if (!username || !password) { setAuthError('loginError', 'Please enter username and password.'); return; }
+      const btn = document.getElementById('loginBtn');
+      btn.innerHTML = '<div class="spinner"></div><span>Signing in…</span>';
+      btn.disabled = true;
+      try {
+        const r = await fetch(`${API}/auth/login`, {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password }),
+        });
+        if (!r.ok) { const e = await r.json(); throw new Error(e.detail || 'Login failed'); }
+        const data = await r.json();
+        authToken = data.access_token;
+        currentUser = data.user;
+        localStorage.setItem('sd_token', authToken);
+        onSignedIn();
+      } catch (e) {
+        setAuthError('loginError', e.message);
+      } finally {
+        btn.innerHTML = '<i data-lucide="log-in" class="w-4 h-4"></i><span>Sign In</span>';
+        btn.disabled = false;
+        lucide.createIcons();
+      }
+    }
+
+    async function handleRegister() {
+      const username = document.getElementById('regUsername').value.trim();
+      const email    = document.getElementById('regEmail').value.trim();
+      const password = document.getElementById('regPassword').value;
+      const confirm  = document.getElementById('regConfirm').value;
+      if (!username || !email || !password) { setAuthError('registerError', 'All fields are required.'); return; }
+      if (password !== confirm) { setAuthError('registerError', 'Passwords do not match.'); return; }
+      if (password.length < 8) { setAuthError('registerError', 'Password must be at least 8 characters.'); return; }
+      const btn = document.getElementById('registerBtn');
+      btn.innerHTML = '<div class="spinner"></div><span>Creating account…</span>';
+      btn.disabled = true;
+      try {
+        const r = await fetch(`${API}/auth/register`, {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, email, password }),
+        });
+        if (!r.ok) { const e = await r.json(); throw new Error(e.detail || 'Registration failed'); }
+        const data = await r.json();
+        authToken = data.access_token;
+        currentUser = data.user;
+        localStorage.setItem('sd_token', authToken);
+        onSignedIn();
+      } catch (e) {
+        setAuthError('registerError', e.message);
+      } finally {
+        btn.innerHTML = '<i data-lucide="user-plus" class="w-4 h-4"></i><span>Create Account</span>';
+        btn.disabled = false;
+        lucide.createIcons();
+      }
+    }
+
+    function logout() {
+      authToken = null;
+      currentUser = null;
+      localStorage.removeItem('sd_token');
+      document.getElementById('sidebarUsername').textContent = '—';
+      document.getElementById('emptyState').classList.remove('hidden');
+      document.getElementById('results').classList.add('hidden');
+      document.getElementById('historyBody').innerHTML = '<tr><td colspan="7" class="py-6 text-center text-slate-600">Sign in to view your history</td></tr>';
+      document.getElementById('loginUsername').value = '';
+      document.getElementById('loginPassword').value = '';
+      switchTab('signin');
+      showAuthOverlay();
+    }
 
     // ── Init ──────────────────────────────────────────────────────
     document.addEventListener('DOMContentLoaded', () => {
       lucide.createIcons();
       setCurrentHour();
-      loadHistory();
+      checkAuth();
       checkAPI();
     });
 
@@ -658,7 +854,7 @@
       btn.innerHTML = '<div class="spinner"></div>';
       btn.disabled = true;
       try {
-        const r = await fetch(`${API}/vin/${vin}`);
+        const r = await fetch(`${API}/vin/${vin}`, { headers: authHeaders() });
         if (!r.ok) throw new Error('Lookup failed');
         const v = await r.json();
         showVinCard(v);
@@ -709,7 +905,7 @@
         temperature:         parseFloat(document.getElementById('tempSlider').value),
         precipitation:       parseFloat(document.getElementById('precipSlider').value) / 100,
         visibility:          parseFloat(document.getElementById('visSlider').value) / 10,
-        driver_id:           document.getElementById('driverIdInput').value.trim() || 'anonymous',
+        driver_id:           currentUser ? currentUser.username : 'anonymous',
         accidents_last_3yr:  parseInt(document.getElementById('accidentSlider').value),
         tickets_last_3yr:    parseInt(document.getElementById('ticketSlider').value),
         vin:                 vin.length === 17 ? vin : null,
@@ -718,7 +914,7 @@
 
       try {
         const r = await fetch(`${API}/predict`, {
-          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          method: 'POST', headers: authHeaders(),
           body: JSON.stringify(payload),
         });
         if (!r.ok) throw new Error('Prediction failed');
@@ -879,7 +1075,7 @@
           scenario_visibility:    scenVis,
         };
         try {
-          const r = await fetch(`${API}/predict`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
+          const r = await fetch(`${API}/predict`, { method:'POST', headers: authHeaders(), body: JSON.stringify(payload) });
           const res = await r.json();
           const delta = res.risk_score - currentResult.risk_score;
           const color = scoreColor(res.risk_score);
@@ -909,7 +1105,7 @@
       for (const p of precipPoints) {
         try {
           const r = await fetch(`${API}/predict`, {
-            method: 'POST', headers: {'Content-Type':'application/json'},
+            method: 'POST', headers: authHeaders(),
             body: JSON.stringify({ temperature: baseTemp, precipitation: p, visibility: 6.2, accidents_last_3yr: parseInt(document.getElementById('accidentSlider').value), tickets_last_3yr: parseInt(document.getElementById('ticketSlider').value), vin, hour_of_day: hour }),
           });
           const res = await r.json();
@@ -950,23 +1146,27 @@
 
     // ── History ───────────────────────────────────────────────────
     async function loadHistory() {
+      if (!authToken) return;
+      const tbody = document.getElementById('historyBody');
       try {
-        const r = await fetch(`${API}/history?limit=10`);
+        const r = await fetch(`${API}/history?limit=15`, { headers: authHeaders() });
+        if (!r.ok) throw new Error();
         const data = await r.json();
-        const tbody = document.getElementById('historyBody');
         if (!data.length) {
-          tbody.innerHTML = '<tr><td colspan="7" class="py-6 text-center text-slate-600">No predictions yet</td></tr>';
+          tbody.innerHTML = '<tr><td colspan="7" class="py-6 text-center text-slate-600">No predictions yet — run your first analysis above</td></tr>';
           return;
         }
-        const levelColors = { LOW:'text-emerald-400', MODERATE:'text-amber-400', HIGH:'text-orange-400', CRITICAL:'text-rose-400', MEDIUM:'text-amber-400' };
+        const levelColors = { LOW:'text-emerald-400', MEDIUM:'text-amber-400', MODERATE:'text-amber-400', HIGH:'text-orange-400', CRITICAL:'text-rose-400' };
         tbody.innerHTML = data.map(row => {
-          const time  = row.created_at ? new Date(row.created_at).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}) : '—';
-          const date  = row.created_at ? new Date(row.created_at).toLocaleDateString([], {month:'short',day:'numeric'}) : '';
+          const dt    = row.created_at ? new Date(row.created_at) : null;
+          const time  = dt ? dt.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) : '—';
+          const date  = dt ? dt.toLocaleDateString([], {month:'short', day:'numeric'}) : '';
           const color = scoreColor(row.final_score);
           const lvlCls = levelColors[row.risk_level] || 'text-slate-400';
+          const loc   = row.city || '—';
           return `<tr class="hist-row border-b border-white border-opacity-3 transition-colors" style="border-color:rgba(255,255,255,0.03)">
             <td class="py-2.5 pr-4"><div class="text-xs text-white">${time}</div><div class="text-xs text-slate-600">${date}</div></td>
-            <td class="py-2.5 pr-4 text-xs text-slate-400">${row.driver_id || '—'}</td>
+            <td class="py-2.5 pr-4 text-xs text-slate-400">${loc}</td>
             <td class="py-2.5 pr-4">
               <div class="flex items-center gap-2">
                 <div class="w-8 h-1.5 rounded-full bg-white bg-opacity-10 overflow-hidden">
@@ -982,7 +1182,7 @@
           </tr>`;
         }).join('');
       } catch {
-        document.getElementById('historyBody').innerHTML = '<tr><td colspan="7" class="py-6 text-center text-slate-600">Failed to load history</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="7" class="py-6 text-center text-slate-600">Failed to load history</td></tr>';
       }
     }
   </script>

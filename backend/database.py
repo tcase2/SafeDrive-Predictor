@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker, declarative_base
 import os
 
@@ -19,5 +19,21 @@ def get_db():
 
 
 def init_db():
-    from backend.models import DrivingRecord, Vehicle  # noqa: F401
+    from backend.models import User, DrivingRecord, Vehicle, PredictionLog  # noqa: F401
     Base.metadata.create_all(bind=engine)
+    _migrate()
+
+
+def _migrate():
+    """Add new columns to existing tables without dropping data."""
+    migrations = [
+        "ALTER TABLE prediction_logs ADD COLUMN user_id INTEGER REFERENCES users(id)",
+        "ALTER TABLE prediction_logs ADD COLUMN city TEXT",
+    ]
+    with engine.connect() as conn:
+        for sql in migrations:
+            try:
+                conn.execute(text(sql))
+                conn.commit()
+            except Exception:
+                pass  # Column already exists
