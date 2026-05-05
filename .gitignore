@@ -1,0 +1,36 @@
+# Environment variables — never commit secrets
+.env
+
+# Python cache
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+
+# Virtual environments
+venv/
+env/
+.venv/
+
+# SQLite database — local state only
+data/*.db
+data/*.db-shm
+data/*.db-wal
+
+# Trained model artifacts (regenerated on startup)
+# Remove the next two lines if you want to commit the pre-trained model
+# models/*.pkl
+
+# Jupyter
+.ipynb_checkpoints/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
