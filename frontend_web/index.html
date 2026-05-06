@@ -915,37 +915,6 @@
       chevron.style.transform = hidden ? '' : 'rotate(180deg)';
     }
 
-      const ctx = document.getElementById('scenarioChart').getContext('2d');
-      if (scenarioChart) scenarioChart.destroy();
-      scenarioChart = new Chart(ctx, {
-        type: 'line',
-        data: {
-          labels: precipPoints.map(p => p.toFixed(2)),
-          datasets: [{
-            data: scores,
-            borderColor: '#6366f1',
-            backgroundColor: 'rgba(99,102,241,0.08)',
-            borderWidth: 2,
-            fill: true,
-            tension: 0.4,
-            pointRadius: 3,
-            pointBackgroundColor: scores.map(s => scoreColor(s || 0)),
-            pointBorderColor: 'transparent',
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ` Risk: ${ctx.raw?.toFixed(1)}` }, backgroundColor: '#1e293b', titleColor: '#94a3b8', bodyColor: '#e2e8f0', borderColor: 'rgba(255,255,255,0.1)', borderWidth: 1 } },
-          scales: {
-            x: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#64748b', font: { size: 10 }, maxTicksLimit: 7 }, title: { display: true, text: 'Precipitation (in/hr)', color: '#475569', font: { size: 10 } } },
-            y: { min: 0, max: 100, grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#64748b', font: { size: 10 }, stepSize: 25 } },
-          },
-          animation: { duration: 600, easing: 'easeInOutQuart' },
-        }
-      });
-    }
-
     // ── History ───────────────────────────────────────────────────
     async function loadHistory() {
       if (!authToken) return;
