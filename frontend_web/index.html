@@ -177,48 +177,47 @@
   <!-- ═══════════════════════════════════════════════════════════════
        AUTH OVERLAY
   ═══════════════════════════════════════════════════════════════ -->
-  <div id="authOverlay" class="fixed inset-0 z-50 flex items-center justify-center">
-    <div class="glass-strong p-8 w-full max-w-sm mx-4 fade-in">
+  <div id="authOverlay" style="position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:rgba(2,6,23,0.97);backdrop-filter:blur(12px)">
+    <div class="glass-strong fade-in" style="padding:2rem;width:100%;max-width:360px;margin:0 1rem">
 
       <!-- Logo -->
-      <div class="flex items-center gap-3 mb-7">
-        <div class="w-10 h-10 rounded-xl bg-indigo-600 flex items-center justify-center shadow-lg" style="box-shadow:0 4px 20px rgba(99,102,241,0.4)">
-          <i data-lucide="shield-check" class="w-5 h-5 text-white"></i>
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:1.75rem">
+        <div style="width:40px;height:40px;border-radius:12px;background:#4f46e5;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(99,102,241,0.4)">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
         </div>
         <div>
-          <div class="text-base font-bold text-white">SafeDrive Predictor</div>
-          <div class="text-xs text-slate-500">Road Risk Intelligence</div>
+          <div style="font-size:15px;font-weight:700;color:white">SafeDrive Predictor</div>
+          <div style="font-size:11px;color:#64748b">Road Risk Intelligence</div>
         </div>
       </div>
 
       <!-- Tabs -->
-      <div class="flex gap-1 mb-5 p-1 rounded-xl" style="background:rgba(255,255,255,0.04)">
-        <button id="tabSignIn" onclick="switchTab('signin')" class="auth-tab-active flex-1 py-2 text-sm font-medium rounded-lg transition-all">Sign In</button>
-        <button id="tabRegister" onclick="switchTab('register')" class="auth-tab flex-1 py-2 text-sm font-medium rounded-lg transition-all">Create Account</button>
+      <div id="authTabs" style="display:flex;gap:4px;margin-bottom:1.25rem;padding:4px;border-radius:12px;background:rgba(255,255,255,0.04)">
+        <button id="tabSignIn" style="flex:1;padding:8px;font-size:13px;font-weight:500;border-radius:8px;border:none;cursor:pointer;transition:all 0.2s;background:rgba(99,102,241,0.2);color:#a5b4fc;border:1px solid rgba(99,102,241,0.3)" onclick="authSwitchTab('signin')">Sign In</button>
+        <button id="tabRegister" style="flex:1;padding:8px;font-size:13px;font-weight:500;border-radius:8px;border:1px solid transparent;cursor:pointer;transition:all 0.2s;background:transparent;color:#64748b" onclick="authSwitchTab('register')">Create Account</button>
       </div>
 
       <!-- Sign In Form -->
-      <div id="formSignIn" class="space-y-3">
-        <input id="loginUsername" type="text" class="sd-input" placeholder="Username or email" autocomplete="username" />
-        <input id="loginPassword" type="password" class="sd-input" placeholder="Password" autocomplete="current-password" />
-        <div id="loginError" class="hidden text-xs text-rose-400 bg-rose-500 bg-opacity-10 border border-rose-500 border-opacity-20 rounded-lg px-3 py-2"></div>
-        <button onclick="handleLogin()" class="btn-primary" id="loginBtn">
-          <i data-lucide="log-in" class="w-4 h-4"></i>
-          <span>Sign In</span>
-        </button>
+      <div id="formSignIn" style="display:flex;flex-direction:column;gap:10px">
+        <input id="loginUsername" type="text" class="sd-input" placeholder="Username or email" autocomplete="username" onkeydown="if(event.key==='Enter')handleLogin()" />
+        <input id="loginPassword" type="password" class="sd-input" placeholder="Password" autocomplete="current-password" onkeydown="if(event.key==='Enter')handleLogin()" />
+        <div id="loginError" style="display:none;font-size:12px;color:#f87171;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.2);border-radius:8px;padding:8px 12px"></div>
+        <button id="loginBtn" class="btn-primary" onclick="handleLogin()">Sign In</button>
       </div>
 
       <!-- Register Form -->
-      <div id="formRegister" class="hidden space-y-3">
-        <input id="regUsername" type="text" class="sd-input" placeholder="Username (3–50 characters)" autocomplete="username" />
+      <div id="formRegister" style="display:none;flex-direction:column;gap:10px">
+        <input id="regUsername" type="text" class="sd-input" placeholder="Username (3–50 chars)" autocomplete="username" />
         <input id="regEmail" type="email" class="sd-input" placeholder="Email address" autocomplete="email" />
-        <input id="regPassword" type="password" class="sd-input" placeholder="Password (min 8 characters)" autocomplete="new-password" />
-        <input id="regConfirm" type="password" class="sd-input" placeholder="Confirm password" autocomplete="new-password" />
-        <div id="registerError" class="hidden text-xs text-rose-400 bg-rose-500 bg-opacity-10 border border-rose-500 border-opacity-20 rounded-lg px-3 py-2"></div>
-        <button onclick="handleRegister()" class="btn-primary" id="registerBtn">
-          <i data-lucide="user-plus" class="w-4 h-4"></i>
-          <span>Create Account</span>
-        </button>
+        <input id="regPassword" type="password" class="sd-input" placeholder="Password (min 8 chars)" autocomplete="new-password" />
+        <input id="regConfirm" type="password" class="sd-input" placeholder="Confirm password" autocomplete="new-password" onkeydown="if(event.key==='Enter')handleRegister()" />
+        <div id="registerError" style="display:none;font-size:12px;color:#f87171;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.2);border-radius:8px;padding:8px 12px"></div>
+        <button id="registerBtn" class="btn-primary" onclick="handleRegister()">Create Account</button>
+      </div>
+
+      <!-- Guest -->
+      <div style="margin-top:1rem;padding-top:1rem;border-top:1px solid rgba(255,255,255,0.06);text-align:center">
+        <button onclick="continueAsGuest()" style="font-size:12px;color:#64748b;background:none;border:none;cursor:pointer;text-decoration:underline;text-underline-offset:3px" onmouseover="this.style.color='#94a3b8'" onmouseout="this.style.color='#64748b'">Continue as Guest</button>
       </div>
 
     </div>
@@ -564,10 +563,11 @@
        JAVASCRIPT
   ═══════════════════════════════════════════════════════════════ -->
   <script>
-    const API = 'http://localhost:8080';
+    const API = window.location.origin;
     let currentResult = null;
     let currentUser   = null;
-    let authToken        = localStorage.getItem('sd_token');
+    let authToken     = localStorage.getItem('sd_token');
+    let isGuest       = false;
     const ARC_LEN = Math.PI * 90;
 
     // ── Auth helpers ──────────────────────────────────────────────
@@ -585,27 +585,29 @@
       document.getElementById('authOverlay').style.display = 'none';
     }
 
-    function switchTab(tab) {
+    function authSwitchTab(tab) {
       const isSignIn = tab === 'signin';
-      document.getElementById('formSignIn').classList.toggle('hidden', !isSignIn);
-      document.getElementById('formRegister').classList.toggle('hidden', isSignIn);
-      document.getElementById('tabSignIn').className = isSignIn ? 'auth-tab-active flex-1 py-2 text-sm font-medium rounded-lg transition-all' : 'auth-tab flex-1 py-2 text-sm font-medium rounded-lg transition-all';
-      document.getElementById('tabRegister').className = isSignIn ? 'auth-tab flex-1 py-2 text-sm font-medium rounded-lg transition-all' : 'auth-tab-active flex-1 py-2 text-sm font-medium rounded-lg transition-all';
-      document.getElementById('loginError').classList.add('hidden');
-      document.getElementById('registerError').classList.add('hidden');
+      document.getElementById('formSignIn').style.display   = isSignIn ? 'flex' : 'none';
+      document.getElementById('formRegister').style.display = isSignIn ? 'none' : 'flex';
+      document.getElementById('loginError').style.display    = 'none';
+      document.getElementById('registerError').style.display = 'none';
+      const activeStyle   = 'flex:1;padding:8px;font-size:13px;font-weight:500;border-radius:8px;border:1px solid rgba(99,102,241,0.3);cursor:pointer;background:rgba(99,102,241,0.2);color:#a5b4fc';
+      const inactiveStyle = 'flex:1;padding:8px;font-size:13px;font-weight:500;border-radius:8px;border:1px solid transparent;cursor:pointer;background:transparent;color:#64748b';
+      document.getElementById('tabSignIn').style.cssText   = isSignIn ? activeStyle : inactiveStyle;
+      document.getElementById('tabRegister').style.cssText = isSignIn ? inactiveStyle : activeStyle;
     }
 
-    function setAuthError(formId, msg) {
-      const el = document.getElementById(formId);
+    function showAuthError(elId, msg) {
+      const el = document.getElementById(elId);
       el.textContent = msg;
-      el.classList.remove('hidden');
+      el.style.display = 'block';
     }
 
     async function checkAuth() {
       if (!authToken) { showAuthOverlay(); return; }
       try {
         const r = await fetch(`${API}/auth/me`, { headers: authHeaders() });
-        if (!r.ok) throw new Error('Invalid token');
+        if (!r.ok) throw new Error();
         currentUser = await r.json();
         onSignedIn();
       } catch {
@@ -617,35 +619,43 @@
 
     function onSignedIn() {
       hideAuthOverlay();
-      document.getElementById('sidebarUsername').textContent = currentUser.username;
-      loadHistory();
+      const label = isGuest ? 'Guest' : (currentUser ? currentUser.username : 'Guest');
+      document.getElementById('sidebarUsername').textContent = label;
+      if (!isGuest) loadHistory();
       lucide.createIcons();
     }
 
     async function handleLogin() {
       const username = document.getElementById('loginUsername').value.trim();
       const password = document.getElementById('loginPassword').value;
-      if (!username || !password) { setAuthError('loginError', 'Please enter username and password.'); return; }
+      if (!username || !password) {
+        showAuthError('loginError', 'Please enter your username/email and password.');
+        return;
+      }
       const btn = document.getElementById('loginBtn');
-      btn.innerHTML = '<div class="spinner"></div><span>Signing in…</span>';
+      btn.textContent = 'Signing in…';
       btn.disabled = true;
       try {
         const r = await fetch(`${API}/auth/login`, {
-          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ username, password }),
         });
-        if (!r.ok) { const e = await r.json(); throw new Error(e.detail || 'Login failed'); }
+        if (!r.ok) {
+          const e = await r.json().catch(() => ({}));
+          throw new Error(e.detail || 'Invalid username or password.');
+        }
         const data = await r.json();
-        authToken = data.access_token;
+        authToken   = data.access_token;
         currentUser = data.user;
+        isGuest     = false;
         localStorage.setItem('sd_token', authToken);
         onSignedIn();
-      } catch (e) {
-        setAuthError('loginError', e.message);
+      } catch (err) {
+        showAuthError('loginError', err.message);
       } finally {
-        btn.innerHTML = '<i data-lucide="log-in" class="w-4 h-4"></i><span>Sign In</span>';
+        btn.textContent = 'Sign In';
         btn.disabled = false;
-        lucide.createIcons();
       }
     }
 
@@ -654,35 +664,57 @@
       const email    = document.getElementById('regEmail').value.trim();
       const password = document.getElementById('regPassword').value;
       const confirm  = document.getElementById('regConfirm').value;
-      if (!username || !email || !password) { setAuthError('registerError', 'All fields are required.'); return; }
-      if (password !== confirm) { setAuthError('registerError', 'Passwords do not match.'); return; }
-      if (password.length < 8) { setAuthError('registerError', 'Password must be at least 8 characters.'); return; }
+      if (!username || !email || !password || !confirm) {
+        showAuthError('registerError', 'All fields are required.');
+        return;
+      }
+      if (password.length < 8) {
+        showAuthError('registerError', 'Password must be at least 8 characters.');
+        return;
+      }
+      if (password !== confirm) {
+        showAuthError('registerError', 'Passwords do not match.');
+        return;
+      }
       const btn = document.getElementById('registerBtn');
-      btn.innerHTML = '<div class="spinner"></div><span>Creating account…</span>';
+      btn.textContent = 'Creating account…';
       btn.disabled = true;
       try {
         const r = await fetch(`${API}/auth/register`, {
-          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ username, email, password }),
         });
-        if (!r.ok) { const e = await r.json(); throw new Error(e.detail || 'Registration failed'); }
+        if (!r.ok) {
+          const e = await r.json().catch(() => ({}));
+          throw new Error(e.detail || 'Registration failed.');
+        }
         const data = await r.json();
-        authToken = data.access_token;
+        authToken   = data.access_token;
         currentUser = data.user;
+        isGuest     = false;
         localStorage.setItem('sd_token', authToken);
         onSignedIn();
-      } catch (e) {
-        setAuthError('registerError', e.message);
+      } catch (err) {
+        showAuthError('registerError', err.message);
       } finally {
-        btn.innerHTML = '<i data-lucide="user-plus" class="w-4 h-4"></i><span>Create Account</span>';
+        btn.textContent = 'Create Account';
         btn.disabled = false;
-        lucide.createIcons();
       }
     }
 
-    function logout() {
-      authToken = null;
+    function continueAsGuest() {
+      authToken   = null;
       currentUser = null;
+      isGuest     = true;
+      localStorage.removeItem('sd_token');
+      onSignedIn();
+    }
+
+    function logout() {
+      authToken   = null;
+      currentUser = null;
+      isGuest     = false;
       localStorage.removeItem('sd_token');
       document.getElementById('sidebarUsername').textContent = '—';
       document.getElementById('emptyState').classList.remove('hidden');
@@ -690,7 +722,9 @@
       document.getElementById('historyBody').innerHTML = '<tr><td colspan="7" class="py-6 text-center text-slate-600">Sign in to view your history</td></tr>';
       document.getElementById('loginUsername').value = '';
       document.getElementById('loginPassword').value = '';
-      switchTab('signin');
+      document.getElementById('loginError').style.display = 'none';
+      document.getElementById('registerError').style.display = 'none';
+      authSwitchTab('signin');
       showAuthOverlay();
     }
 
