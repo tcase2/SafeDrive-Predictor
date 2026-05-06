@@ -9,6 +9,8 @@ from typing import Optional, List
 from fastapi import FastAPI, Depends, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2PasswordBearer
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -342,3 +344,16 @@ def get_prediction_history(
         }
         for l in logs
     ]
+
+
+# ---------------------------------------------------------------------------
+# Serve frontend (must be last — catches everything not matched above)
+# ---------------------------------------------------------------------------
+
+_FRONTEND_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "frontend_web")
+
+@app.get("/", include_in_schema=False)
+def serve_index():
+    return FileResponse(os.path.join(_FRONTEND_DIR, "index.html"))
+
+app.mount("/static", StaticFiles(directory=_FRONTEND_DIR), name="static")
