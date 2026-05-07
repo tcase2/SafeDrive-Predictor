@@ -108,6 +108,7 @@ def register(body: UserRegister, db: Session = Depends(get_db)):
         username=body.username,
         email=body.email,
         hashed_password=hash_password(body.password),
+        location=body.location,
     )
     db.add(user)
     db.commit()
@@ -128,6 +129,19 @@ def login(body: UserLogin, db: Session = Depends(get_db)):
 
     token = create_token(user.id)
     return TokenResponse(access_token=token, user=UserResponse.model_validate(user))
+
+
+@app.patch("/auth/profile", response_model=UserResponse, tags=["Auth"])
+def update_profile(
+    body: dict,
+    db: Session = Depends(get_db),
+    user: User = Depends(require_user),
+):
+    if "location" in body:
+        user.location = body["location"] or None
+    db.commit()
+    db.refresh(user)
+    return UserResponse.model_validate(user)
 
 
 @app.get("/auth/me", response_model=UserResponse, tags=["Auth"])

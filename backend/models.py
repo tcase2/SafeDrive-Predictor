@@ -11,6 +11,7 @@ class User(Base):
     username = Column(String(50), unique=True, nullable=False, index=True)
     email = Column(String(150), unique=True, nullable=False)
     hashed_password = Column(String, nullable=False)
+    location = Column(String(150), nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     predictions = relationship("PredictionLog", back_populates="user")

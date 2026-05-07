@@ -29,6 +29,7 @@ def _migrate():
     migrations = [
         "ALTER TABLE prediction_logs ADD COLUMN user_id INTEGER REFERENCES users(id)",
         "ALTER TABLE prediction_logs ADD COLUMN city TEXT",
+        "ALTER TABLE users ADD COLUMN location TEXT",
     ]
     with engine.connect() as conn:
         for sql in migrations:
