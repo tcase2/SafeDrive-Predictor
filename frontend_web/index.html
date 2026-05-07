@@ -659,7 +659,10 @@
         localStorage.setItem('sd_token', authToken);
         onSignedIn();
       } catch (err) {
-        showAuthError('loginError', err.message);
+        const msg = err.message === 'Failed to fetch'
+          ? 'Cannot reach server. Make sure start_backend.bat is running.'
+          : err.message;
+        showAuthError('loginError', msg);
       } finally {
         btn.textContent = 'Sign In';
         btn.disabled = false;
@@ -704,7 +707,10 @@
         localStorage.setItem('sd_token', authToken);
         onSignedIn();
       } catch (err) {
-        showAuthError('registerError', err.message);
+        const msg = err.message === 'Failed to fetch'
+          ? 'Cannot reach server. Make sure start_backend.bat is running.'
+          : err.message;
+        showAuthError('registerError', msg);
       } finally {
         btn.textContent = 'Create Account';
         btn.disabled = false;
